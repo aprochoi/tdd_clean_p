@@ -64,6 +64,16 @@ public class QueueService {
         return new QueueStatus(token.getStatus(), rank+1); // 순번은 내 앞사람 수 + 1
     }
 
+    @Transactional
+    public void expireToken(String tokenValue) {
+        QueueToken token = queueTokenRepository.findByTokenValue(tokenValue).orElse(null); // 토큰이 없어도 에러는 아니다.
+
+        if (token != null) {
+            token.expire();
+            queueTokenRepository.save(token);
+        }
+    }
+
     // 응답용 DTO
     public record QueueStatus(QueueToken.TokenStatus status, long rank) {}
 }

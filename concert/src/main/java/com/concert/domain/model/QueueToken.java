@@ -49,4 +49,8 @@ public class QueueToken {
     public boolean isActive() {
         return this.status == TokenStatus.ACTIVE && LocalDateTime.now().isBefore(this.expiresAt);
     }
+
+    public void expire() {
+        this.status = TokenStatus.EXPIRED;
+    }
 }
