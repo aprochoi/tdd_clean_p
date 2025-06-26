@@ -42,4 +42,24 @@ public class Reservation {
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
     }
+
+    /**
+     * 결제를 위해 예약 상태가 유효한지 검증하는 메소드
+     */
+    public void validateForPayment() {
+        if (this.status != ReservationStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException("결제 대기 상태의 예약만 결제할 수 있습니다.");
+        }
+
+        if (LocalDateTime.now().isAfter(this.expiresAt)) {
+            throw new IllegalStateException("결제 가능 시간이 만료되었습니다.");
+        }
+    }
+
+    /**
+     * 예약 상태를 완료로 변경하는 메소드
+     */
+    public void complete() {
+        this.status = ReservationStatus.COMPLETED;
+    }
 }

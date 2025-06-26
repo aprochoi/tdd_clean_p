@@ -6,6 +6,8 @@ import com.concert.infrastructure.db.jpa.ReservationJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class ReservationRepositoryImpl implements ReservationRepository {
@@ -14,5 +16,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public Reservation save(Reservation reservation) {
         return jpa.save(reservation);
+    }
+
+    @Override
+    public Optional<Reservation> findByIdAndUserId(Long reservationId, Long userId) {
+        return jpa.findByIdAndUserId(reservationId, userId);
     }
 }

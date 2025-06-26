@@ -49,4 +49,11 @@ public class Seat {
         }
         this.status = SeatStatus.RESERVED;
     }
+
+    public void sell() {
+        if (this.status != SeatStatus.RESERVED) {
+            throw new IllegalStateException("임시 배정 상태의 좌석만 판매 처리할 수 있습니다.");
+        }
+        this.status = SeatStatus.SOLD;
+    }
 }
