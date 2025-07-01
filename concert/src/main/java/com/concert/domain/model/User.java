@@ -24,7 +24,7 @@ public class User {
         this.balance = balance;
     }
 
-    public User(long id, String name, long balance) {
+    public User(Long id, String name, long balance) {
         this.id = id;
         this.name = name;
         this.balance = balance;
