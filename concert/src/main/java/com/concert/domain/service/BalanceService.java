@@ -18,7 +18,7 @@ public class BalanceService {
      * @return 충전 후 잔액 정보
      */
     @Transactional
-    public BalanceResponse chargeBalance(long userId, long amount) {
+    public User chargeBalance(long userId, long amount) {
         // 1.유저 정보 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -26,18 +26,14 @@ public class BalanceService {
         // 2.잔액 충전 (도메인 객체에서 진행)
         user.charge(amount);
 
-        // 3.변경된 유저 정보 저장 (JPA의 더티 체킹으로 자동 저장이 되므로 없어도 되긴함)
-        userRepository.save(user);
-
-        return new BalanceResponse(user.getId(), user.getBalance());
+        // 3.변경된 유저 정보 저장 후 반환
+        return  userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
-    public BalanceResponse getBalance(long userId) {
-        User user = userRepository.findById(userId)
+    public User getBalance(long userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        return new BalanceResponse(user.getId(), user.getBalance());
     }
 
     @Transactional
@@ -51,6 +47,4 @@ public class BalanceService {
 
         userRepository.save(user);
     }
-
-    public record BalanceResponse(Long userId, long balance) {}
 }
