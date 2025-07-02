@@ -27,8 +27,6 @@ import static org.mockito.Mockito.verify;
 class SeatReservationServiceTest {
 
     @Mock
-    private TokenValidator tokenValidator;
-    @Mock
     private ReservationRepository reservationRepository;
     @Mock
     private SeatRepository seatRepository;
@@ -41,18 +39,16 @@ class SeatReservationServiceTest {
     @DisplayName("활성화된 토큰과 예약 가능한 좌석으로 예약 시 임시 배정 성공")
     void reserveSeat_WithValidTokenAndAvailableSeat_ShouldSucceed() {
         //given
-        String validToken = "valid-token";
         Long userId = 1L, seatId = 1L;
         User user = new User("최영민", 0); // 현재 가진 돈은 없지만 임시 배정이므로 성공함
         Seat availableSeat = new Seat(null, 1, 50000, Seat.SeatStatus.AVAILABLE);
 
-        doNothing().when(tokenValidator).validate(validToken);
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(seatRepository.findById(seatId)).willReturn(Optional.of(availableSeat));
         given(reservationRepository.save(any(Reservation.class))).willAnswer(inv -> inv.getArgument(0));
 
         //when
-        Reservation result = seatReservationService.reserveSeat(validToken, userId, seatId);
+        Reservation result = seatReservationService.reserveSeat(userId, seatId);
 
         //then
         assertThat(result.getStatus()).isEqualTo(Reservation.ReservationStatus.PENDING_PAYMENT);
@@ -66,16 +62,14 @@ class SeatReservationServiceTest {
     @DisplayName("이미 예약된 좌석으로 예약 시 예외 발생")
     void reserveSeat_WithReservedSeat_ShouldThrowException() {
         //given
-        String validToken = "valid-token";
         Long userId = 1L, seatId = 1L;
         User user = new User("최영민", 0);
         Seat reservedSet = new Seat(null, 1, 50000, Seat.SeatStatus.RESERVED);
 
-        doNothing().when(tokenValidator).validate(validToken);
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(seatRepository.findById(seatId)).willReturn(Optional.of(reservedSet));
 
         //when & then
-        assertThrows(IllegalStateException.class, () -> seatReservationService.reserveSeat(validToken, userId, seatId));
+        assertThrows(IllegalStateException.class, () -> seatReservationService.reserveSeat(userId, seatId));
     }
 }

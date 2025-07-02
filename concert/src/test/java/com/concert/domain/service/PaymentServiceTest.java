@@ -27,7 +27,6 @@ class PaymentServiceTest {
     @Mock private ReservationRepository reservationRepository;
     @Mock private PaymentHistoryRepository paymentHistoryRepository;
     @Mock private BalanceService balanceService;
-    @Mock private QueueService queueService;
     @InjectMocks
     private PaymentService paymentService;
 
@@ -38,7 +37,6 @@ class PaymentServiceTest {
         Long userId = 1L;
         Long reservationId = 1L;
         Long seatId = 5L;
-        String tokenValue = "active-token";
 
         Concert concert = new Concert("2직준비 콘서트", "김형준");
         ConcertSchedule concertSchedule = new ConcertSchedule(concert, LocalDate.of(2025, 6, 26));
@@ -57,15 +55,13 @@ class PaymentServiceTest {
 
         given(reservationRepository.findByIdAndUserId(reservationId, userId)).willReturn(Optional.of(reservation));
         doNothing().when(balanceService).useBalance(anyLong(), anyLong());
-        doNothing().when(queueService).expireToken(anyString());
         given(paymentHistoryRepository.save(any(PaymentHistory.class))).willAnswer(inv -> inv.getArgument(0));
 
         //when
-        PaymentHistory result = paymentService.processPayment(userId, reservationId, tokenValue);
+        PaymentHistory result = paymentService.processPayment(userId, reservationId);
 
         //then
         verify(balanceService).useBalance(userId, reservation.getPrice());
-        verify(queueService).expireToken(tokenValue);
         verify(paymentHistoryRepository).save(any(PaymentHistory.class));
         assertThat(reservation.getStatus()).isEqualTo(Reservation.ReservationStatus.COMPLETED);
         assertThat(seat.getStatus()).isEqualTo(Seat.SeatStatus.SOLD);

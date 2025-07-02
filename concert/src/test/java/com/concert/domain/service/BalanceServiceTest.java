@@ -39,10 +39,10 @@ class BalanceServiceTest {
         given(userRepository.save(any(User.class))).willAnswer(inv -> inv.getArgument(0));
 
         //when
-        BalanceService.BalanceResponse response = balanceService.chargeBalance(userId, chargeAmount);
+        User updatedUser = balanceService.chargeBalance(userId, chargeAmount);
 
         // then
-        assertThat(response.balance()).isEqualTo(initBalance + chargeAmount);
+        assertThat(updatedUser.getBalance()).isEqualTo(initBalance + chargeAmount);
         verify(userRepository).save(user);
     }
 
@@ -73,10 +73,10 @@ class BalanceServiceTest {
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
         // when
-        BalanceService.BalanceResponse response = balanceService.getBalance(userId);
+        User retrievedUser = balanceService.getBalance(userId);
 
         // then
-        assertThat(response.userId()).isEqualTo(userId);
-        assertThat(response.balance()).isEqualTo(currentBalance);
+        assertThat(retrievedUser.getId()).isEqualTo(userId);
+        assertThat(retrievedUser.getBalance()).isEqualTo(currentBalance);
     }
 }

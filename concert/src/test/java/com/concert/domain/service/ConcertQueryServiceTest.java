@@ -29,12 +29,10 @@ class ConcertQueryServiceTest {
     private ConcertScheduleRepository concertScheduleRepository;
     @Mock
     private SeatRepository seatRepository;
-    @Mock
-    private TokenValidator tokenValidator;
     @InjectMocks
     private ConcertQueryService concertQueryService;
 
-    private final String validToken = "valid-active-token";
+    private final Long testUserId = 1L; // validToken 대신 userId 사용
     private final LocalDate concertDate = LocalDate.of(2025, 7, 5);
     private final ConcertSchedule schedule = new ConcertSchedule(new Concert("형준이의 콘서트", "김형준"), concertDate);
 
@@ -42,22 +40,19 @@ class ConcertQueryServiceTest {
     @DisplayName("예약 가능한 날짜 목록을 성공적으로 조회")
     void getAvailableDates_shouldReturnDateList() {
         //given
-        doNothing().when(tokenValidator).validate(validToken);
         given(concertScheduleRepository.findByConcertDateAfter(any(LocalDate.class))).willReturn(List.of(schedule));
 
         //when
-        List<LocalDate> result = concertQueryService.getAvailableDates(validToken);
+        List<LocalDate> result = concertQueryService.getAvailableDates(testUserId);
 
         //then
         assertThat(result).containsExactly(concertDate);
-        verify(tokenValidator).validate(validToken);
     }
 
     @Test
     @DisplayName("특정 날짜의 예약 가능한 좌석 목록 조회 성공")
     void getAvailableSeats_withValidDate_shouldReturnSeatList() {
         //given
-        doNothing().when(tokenValidator).validate(validToken);
         Seat seat1 = new Seat(schedule, 1, 40000, Seat.SeatStatus.AVAILABLE);
         Seat seat2 = new Seat(schedule, 2, 40000, Seat.SeatStatus.AVAILABLE);
 
@@ -66,11 +61,10 @@ class ConcertQueryServiceTest {
                 .willReturn(List.of(seat1, seat2));
 
         //when
-        List<Seat> result = concertQueryService.getAvailableSeats(validToken, concertDate);
+        List<Seat> result = concertQueryService.getAvailableSeats(testUserId, concertDate);
 
         //then
         assertThat(result).hasSize(2);
-        verify(tokenValidator).validate(validToken);
     }
 
 }

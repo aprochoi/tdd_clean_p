@@ -15,6 +15,5 @@ public interface SeatJpaRepository extends JpaRepository<Seat, Long> {
     List<Seat> findAllByConcertScheduleAndStatus(ConcertSchedule concertSchedule, Seat.SeatStatus status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-//    @Query("SELECT s FROM Seat s WHERE s.id = :id") // 굳이 없어도 되긴 함,,
-    Optional<Seat> findByIdWithLock(@Param("id") long id);
+    Optional<Seat> findById(long id);
 }
