@@ -24,26 +24,26 @@ public class ConcertController {
 
     /**
      * 예약 가능한 콘서트 날짜 목록을 조회합니다.
-     * @param tokenValue 대기열 토큰
+     * @param userId @RequestAttribute를 통해 인터셉터에서 전달된 사용자 ID
      * @return 예약 가능한 날짜 리스트
      */
     @GetMapping("/dates")
-    public ResponseEntity<List<LocalDate>> getAvailableDates(@RequestHeader("Authorization") String tokenValue) {
-        List<LocalDate> dates = concertQueryService.getAvailableDates(tokenValue);
+    public ResponseEntity<List<LocalDate>> getAvailableDates(@RequestAttribute("userId") Long userId) {
+        List<LocalDate> dates = concertQueryService.getAvailableDates(userId);
         return ResponseEntity.ok(dates);
     }
 
     /**
      * 특정 날짜에 예약 가능한 좌석 목록을 조회합니다.
-     * @param tokenValue 대기열 토큰
+     * @param userId @RequestAttribute를 통해 인터셉터에서 전달된 사용자 ID
      * @param date 조회할 날짜
      * @return 예약 가능한 좌석 리스트
      */
     @GetMapping("/seats")
     public ResponseEntity<List<ApiResponse.AvailableSeatResponse>> getAvailableSeats(
-            @RequestHeader("Authorization") String tokenValue, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestAttribute("userId") Long userId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        List<Seat> seats = concertQueryService.getAvailableSeats(tokenValue, date);
+        List<Seat> seats = concertQueryService.getAvailableSeats(userId, date);
         List<ApiResponse.AvailableSeatResponse> response = seats.stream()
                 .map(seat -> new ApiResponse.AvailableSeatResponse(seat.getId(), seat.getSeatNumber(), seat.getPrice()))
                 .toList();
