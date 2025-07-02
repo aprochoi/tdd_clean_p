@@ -16,10 +16,9 @@ public class PaymentService {
     private final ReservationRepository reservationRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final BalanceService balanceService;
-    private final QueueService queueService;
 
     @Transactional
-    public PaymentHistory processPayment(Long userId, Long reservationId, String tokenValue) {
+    public PaymentHistory processPayment(Long userId, Long reservationId) {
         // 1.예약 정보 조회 및 검증 (본인의 예약이 맞는지 확인)
         Reservation reservation = reservationRepository.findByIdAndUserId(reservationId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않는 예약 정보입니다."));
@@ -42,9 +41,6 @@ public class PaymentService {
                 .paidAt(LocalDateTime.now())
                 .build();
         paymentHistoryRepository.save(paymentHistory);
-
-        // 6. 대기열 토큰 만료 처리
-        queueService.expireToken(tokenValue);
 
         return paymentHistory;
     }
